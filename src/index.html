@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nearest point pair</title>
+    <style>
+        #stage {
+            margin-right: 10px;
+            width: 604px;
+            height: 604px;
+            border: solid 1px black;
+            padding: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #info {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+<div style="display:flex; flex-direction: row;">
+    <div id="stage">
+        <div style="width: 100%; height: 100%; background-color: lightgray;"></div>
+    </div>
+    <div id="info">
+        Mouse Point: ({{mouseX}}, {{MouseY}})
+    </div>
+</div>
+</body>
+</html>
