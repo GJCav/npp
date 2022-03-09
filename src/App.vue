@@ -292,6 +292,10 @@ function generatePoints(){
   align-items: center;
 }
 
+#stage canvas {
+  cursor: none !important;
+}
+
 #info {
   display: flex;
   flex-direction: column;
