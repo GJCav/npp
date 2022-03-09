@@ -1,4 +1,5 @@
 
+from cmath import pi, sqrt
 from typing import Dict
 import random
 
@@ -57,7 +58,7 @@ def merge(arr: list, tmp: list, l: int, m: int, r: int, le = lambda x, y: x <= y
 
 ## 用于确认merge的正确性
 def _mergeSort(arr: list, tmp: list, l, r):
-    if l == r - 1: 
+    if l >= r - 1: 
         return
     m = (l+r+1) // 2
     _mergeSort(arr, tmp, l, m)
@@ -68,23 +69,108 @@ def mergeSort(arr: list):
     tmp = [0] * len(arr)
     _mergeSort(arr, tmp, 0, len(arr))
 
+def swap(arr, i, j):
+    x = arr[i]
+    arr[i] = arr[j]
+    arr[j] = x
+
+def insertSort(arr: list, l, r, key):
+    for i in range(l+1, r):
+        k = arr[i]
+        j = i-1
+        while j >= l and key(arr[j]) > key(k):
+            arr[j+1] = arr[j]
+            j -= 1
+        arr[j+1] = k
+
+def selectSort(arr: list, l, r, key):
+    for i in range(l, r):
+        ith = i
+        for j in range(i+1, r):
+            if key(arr[j]) < key(arr[ith]):
+                ith = j
+        swap(arr, i, ith)
+
+def bubbleSort(arr: list, l, r, key):
+    flag = True
+    while flag:
+        flag = False
+        for i in range(l, r-1):
+            if key(arr[i]) > key(arr[i+1]):
+                flag = True
+                swap(arr, i, i+1)
+
+def solveBrute(problem: Problem):
+    arr = problem.pointlist
+    uid = 0
+    vid = 0
+    ans = float("inf")
+    
+    for i in range(len(arr)):
+        for j in range(i+1, len(arr)):
+            curDis = distanceSq(arr[i], arr[j])
+            if curDis < ans:
+                ans = curDis
+                uid = arr[i].id
+                vid = arr[j].id
+
+    return (sqrt(ans), uid, vid)
 
 
-def solve(problem: Problem):
+def solve(problem: Problem, sortFunc = None):
     pointlist = problem.pointlist
-    itp = problem.itp
+    tmpList = [0] * len(pointlist)
 
-    pointlist.sort(key=lambda p: p.x)
-    u = 0
-    v = 0
-    ans = -1
+    pointlist.sort(key=lambda p: (p.x, p.y))
+
+    uid = -1
+    vid = -1
+    ans = float("inf") # 为了加速，这里使用的是距离的平方，这里容易导致实现出错。
 
     def _solve(l, r):
-        if l >= r - 1:
-            return -1
+        nonlocal uid, vid, ans
+
+        if sortFunc and r - l <= 3:
+            pass
+            sortFunc(pointlist, l, r, key = lambda p: p.y)
+            for i in range(l, r):
+                for j in range(i+1, r):
+                    if (pointlist[j].y - pointlist[i].y) ** 2 >= ans:
+                        break
+                    curDis = distanceSq(pointlist[i], pointlist[j])
+                    if curDis < ans:
+                        ans = curDis
+                        uid = pointlist[i].id
+                        vid = pointlist[j].id
+            return ans
+        elif l >= r - 1:
+            return float("inf")
         
-        m = (l + r + 1) / 2
+        m = (l + r + 1) // 2
+        midx = pointlist[m].x
+
+        leftans = _solve(l, m)
+        rightans = _solve(m, r)
+        merge(pointlist, tmpList, l, m, r, lambda a, b: a.y <= b.y)
         
+        subAns = min(leftans, rightans)
+
+        for i in range(l, r):
+            if abs(pointlist[i].x - midx) ** 2 >= subAns: continue
+            for j in range(i+1, r):
+                if (pointlist[j].y - pointlist[i].y) ** 2 >= subAns:
+                    break
+                curDis = distanceSq(pointlist[i], pointlist[j])
+                if curDis < ans:
+                    ans = curDis
+                    uid = pointlist[i].id
+                    vid = pointlist[j].id
+        
+        return ans
+
+    _solve(0, len(pointlist))
+
+    return (sqrt(ans), uid, vid)
 
 
 def generateProblem(w, h, n) -> Problem:
@@ -96,5 +182,40 @@ def generateProblem(w, h, n) -> Problem:
         problem.addPoint(x, y)
     return problem
 
-problem = generateProblem(10, 10, 4)
-solve(problem)
+
+def checkCorrectness():
+    sortFuncs = [
+        insertSort,
+        selectSort,
+        bubbleSort
+    ]
+
+    fail = False
+    for _ in range(1000):
+        print(f"turn {_}")
+        problem = generateProblem(10, 10, 500)
+        __l = [(p.x, p.y) for p in problem.pointlist]
+        resA = solve(problem)
+        resB = solveBrute(problem)
+
+        pa = set([resA[1], resA[2]])
+        pb = set([resB[1], resB[2]])
+        if pa != pb:
+            fail = True
+            print("Fail at B")
+            print(__l)
+            break
+
+        for f in sortFuncs:
+            random.shuffle(problem.pointlist)
+            __l = [(p.x, p.y) for p in problem.pointlist]
+            resC = solve(problem, sortFunc=f)
+            pc = set([resC[1], resC[2]])
+            if pa != pc:
+                fail = True
+                print("Fail at C, " + f.__name__)
+                # print(__l)
+                break
+
+        if fail:
+            break
