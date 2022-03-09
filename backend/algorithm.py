@@ -130,8 +130,7 @@ def solve(problem: Problem, sortFunc = None):
     def _solve(l, r):
         nonlocal uid, vid, ans
 
-        if sortFunc and r - l <= 3:
-            pass
+        if sortFunc and r - l <= 30:
             sortFunc(pointlist, l, r, key = lambda p: p.y)
             for i in range(l, r):
                 for j in range(i+1, r):
@@ -191,7 +190,7 @@ def checkCorrectness():
     ]
 
     fail = False
-    for _ in range(1000):
+    for _ in range(100):
         print(f"turn {_}")
         problem = generateProblem(10, 10, 500)
         __l = [(p.x, p.y) for p in problem.pointlist]
