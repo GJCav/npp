@@ -8,7 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/offscreencanvas": "^2019.6.4",
     "@types/pixi.js": "^5.0.0",
+    "i": "^0.3.7",
     "pixi.js": "^6.2.2",
     "vue": "^3.2.25"
   },

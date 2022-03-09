@@ -130,6 +130,8 @@ let solveProblem = function(){
       pointList[v].g.x,
       pointList[v].g.y
     );
+
+    pointList.forEach((p) => p.unselect())
     pointList[u].select();
     pointList[v].select();
   }else{
