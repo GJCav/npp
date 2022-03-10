@@ -39,10 +39,11 @@ def buildTestSet(n):
 
     if n <= 1000:
         testSet["func"]["brute"] = timerBrute
+    
+    return testSet
 
 
-def test(testSet):
-    problem = A.generateProblem(100, 100, testSet["n"])
+def test(testSet, problem):
     result = {}
     for fn in testSet["func"]:
         result[fn] = testSet["func"][fn](problem)

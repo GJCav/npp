@@ -3,7 +3,7 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import {ref} from 'vue'
 import * as PIXI from 'pixi.js'
-import {round} from './utils'
+import {round, solveWithBackend, PointData} from './utils'
 
 const radius = 3;
 let app: PIXI.Application | null = null;
@@ -250,8 +250,17 @@ function generatePoints(){
   solveProblem();
 }
 
-</script>
+let bckSolveResult = ref({})
+function computeByBackend(){
+  let p: PointData[] = []
+  pointList.forEach((e) => {p.push({x: e.g.x, y: e.g.x})})
+  solveWithBackend(p).then((ans) => {
+    bckSolveResult.value = ans;
+  });
+}
 
+</script>
+ 
 <template>
 <div style="display:flex; flex-direction: row;">
   <div id="stage">
@@ -267,6 +276,15 @@ function generatePoints(){
         Count: <input v-model="inputCountStr" v-on:keyup="inputCountValidator($event)"/> <br/>
         <span v-if="inputCountInvalid" style="color: red;">{{inputCountMsg}}</span> <br/>
         <button v-on:click="generatePoints">Random Points</button>
+      </div>
+
+      <div style="height: 20px;"></div>
+
+      <div style="margin-left: 20px">
+        <button style="margin-left: -20px" v-on:click="computeByBackend">Compute By Backend</button>
+        <ol>
+          <li v-for=""></li>
+        </ol>
       </div>
   </div>
 </div>

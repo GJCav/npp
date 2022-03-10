@@ -3,3 +3,31 @@ export function round(v: number, n: number): number{
     while(n){e *= 10;n--;}
     return Math.round(v * e) / e;
 }
+
+export interface PointData {
+    x: number,
+    y: number
+}
+
+export interface ProblemAnswer {
+    u: PointData,
+    v: PointData,
+    dis: number
+}
+
+export function solveWithBackend(list: PointData[]) : Promise<ProblemAnswer> {
+    return new Promise<ProblemAnswer>((resolve, reject) => {
+        fetch("/api/solve", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({data: list}),
+        })
+        .then((res) => res.json())
+        .then((json) => {
+            resolve(json)
+        })
+        .catch((e) => reject(e))
+    });
+}
