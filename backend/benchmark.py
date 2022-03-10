@@ -1,9 +1,5 @@
 import datetime
 import functools
-from imghdr import tests
-from pprint import pprint
-import json
-from random import shuffle
 from pprint import pprint
 
 import algorithm as A
