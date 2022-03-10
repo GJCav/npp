@@ -250,13 +250,35 @@ function generatePoints(){
   solveProblem();
 }
 
+let netState = ref("");
 let bckSolveResult = ref({})
 function computeByBackend(){
   let p: PointData[] = []
-  pointList.forEach((e) => {p.push({x: e.g.x, y: e.g.x})})
+  pointList.forEach((e) => {p.push({x: e.g.x, y: e.g.y})})
+  netState.value = "Sent request..."
+  document.getElementById("cmpByBckBtn")?.setAttribute("disabled", "disabled");
   solveWithBackend(p).then((ans) => {
     bckSolveResult.value = ans;
-  });
+    netState.value = "Done.."
+  })
+  .catch(() => netState.value = "!!! error !!!")
+  .finally(() => document.getElementById("cmpByBckBtn")?.removeAttribute("disabled"));
+}
+
+function generateByBackend(){
+  netState.value = "Sent request...";
+  document.getElementById("genByBckBtn")?.setAttribute("disabled", "disabled");
+  fetch(`/api/genandsolve?n=${inputCountStr.value}`)
+    .then((res) => res.json())
+    .then((json) => {
+      bckSolveResult.value = json;
+      netState.value = "Done..";
+    })
+    .catch((e) => {
+      netState.value = "!!! error !!!";
+      console.log(e)
+    })
+    .finally(() => document.getElementById("genByBckBtn")?.removeAttribute("disabled"));
 }
 
 </script>
@@ -270,7 +292,7 @@ function computeByBackend(){
       <span>Mouse Point: ({{mouseState.curPos.x}}, {{mouseState.curPos.y}}) </span>
       <span>Distance: {{problem.distance}}</span>
 
-      <button v-on:click="deleteSelectedPoints">Delete Point</button>
+      <button v-on:click="deleteSelectedPoints" style="align-self: baseline;">Delete Point</button>
 
       <div>
         Count: <input v-model="inputCountStr" v-on:keyup="inputCountValidator($event)"/> <br/>
@@ -280,14 +302,35 @@ function computeByBackend(){
 
       <div style="height: 20px;"></div>
 
-      <div style="margin-left: 20px">
-        <button style="margin-left: -20px" v-on:click="computeByBackend">Compute By Backend</button>
-        <ol>
-          <li v-for=""></li>
-        </ol>
+      <div style="margin-left: 10">
+        <button id="cmpByBckBtn" v-on:click="computeByBackend" style="display: inline-block;">Solve By Backend</button>
+        <button id="genByBckBtn" v-on:click="generateByBackend" style="margin-left: 20px;">Generate And Solve By Backend</button>
+        <br/>
+        <span>{{netState}}</span>
+        <ul style="width: 600px;overflow: auto;white-space: nowrap;">
+          <li v-for="(value, key) in bckSolveResult" style="margin-bottom: 10px">
+            {{key}}: <br/>
+            time: {{value["time"]}} s, dis: {{value["dis"]}}, 
+            ({{value["point"]["u"]["x"]}}, {{value["point"]["u"]["y"]}}) -- ({{value["point"]["v"]["x"]}}, {{value["point"]["v"]["y"]}})
+          </li>
+        </ul>
       </div>
   </div>
 </div>
+<br/>
+使用说明：
+<ol>
+  <li>左侧是显示区域，鼠标右键新建点，左键选择点，被选择的点显示为红色。</li>
+  <li>“Count”输入框中点的个数用于设置随机生成点的数目。</li>
+  <li>“Random Points”在前端生成随机的点，要求点的数量不大于1000，前端使用 n^2 算法确定最近点对。</li>
+  <li>“Solve By Backend”将前端生成的点发送到后端，通过Python计算最近点对。</li>
+  <li>“Generate...”后端随机生成“Count”个点，并计算最近点对，这里不限制点的数量。</li>
+  <li>后端运行结果说明：<ul>
+    <li>brute：使用n^2算法</li>
+    <li>solve：使用nlog(n)算法</li>
+    <li>其他：表示在nlog(n)算法递归到点的数量小于等于30时，直接n^2计算最近点对时，使用的排序算法。builtin 表示Python自带的排序算法。</li>
+  </ul></li>
+</ol>
 </template>
 
 <style>
@@ -295,7 +338,7 @@ function computeByBackend(){
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  text-align: left;
   color: #2c3e50;
 }
 

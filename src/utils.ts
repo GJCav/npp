@@ -15,8 +15,8 @@ export interface ProblemAnswer {
     dis: number
 }
 
-export function solveWithBackend(list: PointData[]) : Promise<ProblemAnswer> {
-    return new Promise<ProblemAnswer>((resolve, reject) => {
+export function solveWithBackend(list: PointData[]) : Promise<{[propName: string]: ProblemAnswer}> {
+    return new Promise((resolve, reject) => {
         fetch("/api/solve", {
             method: "POST",
             headers: {

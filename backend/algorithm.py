@@ -100,6 +100,11 @@ def bubbleSort(arr: list, l, r, key):
                 flag = True
                 swap(arr, i, i+1)
 
+def builtinSort(arr: list, l, r, key):
+    t = arr[l:r]
+    t.sort(key=key)
+    arr[l:r] = t
+
 def solveBrute(problem: Problem):
     arr = problem.pointlist
     uid = 0
@@ -114,7 +119,7 @@ def solveBrute(problem: Problem):
                 uid = arr[i].id
                 vid = arr[j].id
 
-    return (sqrt(ans), uid, vid)
+    return (sqrt(ans).real, uid, vid)
 
 
 def solve(problem: Problem, sortFunc = None):
@@ -169,7 +174,7 @@ def solve(problem: Problem, sortFunc = None):
 
     _solve(0, len(pointlist))
 
-    return (sqrt(ans), uid, vid)
+    return (sqrt(ans).real, uid, vid)
 
 
 def generateProblem(w, h, n) -> Problem:

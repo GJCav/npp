@@ -1,19 +1,13 @@
+from os import abort
 from flask import Flask, request
-from algorithm import Problem
-from benchmark import buildTestSet, test
+from algorithm import Problem, generateProblem
+from benchmark import buildTestSet, readableTestResult, test
 
 app = Flask("npp")
 
 @app.route("/hello")
 def hello():
     return {"data": "hello world!"}
-
-
-def toPos(problem: Problem, id):
-    return {
-        "x": problem.itp[id].x,
-        "y": problem.itp[id].y,
-    }
 
 
 @app.route("/solve", methods=["POST"])
@@ -26,13 +20,17 @@ def solve():
     
     result = test(testSet, problem)
     
-    rtn = {}
-    for k in result:
-        rtn[k] = {
-            "time": result[k][0],
-            "point": {"u": toPos(problem, result[k][1][1]), "v": toPos(problem, result[k][1][2])},
-            "dis": result[k][1][0].real
-        }
-    return rtn
+    return readableTestResult(result, problem)
+
+
+@app.route("/genandsolve")
+def genAndSolve():
+    n = request.args.get("n", -1, int)
+    if n < 2:
+        abort(400)
+    testSet = buildTestSet(n)
+    problem = generateProblem(100, 100, n)
+    result = test(testSet, problem)
+    return readableTestResult(result, problem)
 
 app.run(port=8089)
