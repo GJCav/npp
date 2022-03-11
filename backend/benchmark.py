@@ -89,9 +89,10 @@ def multipleTest(repeat = 5):
             r = test(tSet, problem)
             result = readableTestResult(r, problem)
             for k in result:
-                aveRst[k] = (aveRst.get(k) or 0) + result[k]["time"]
+                # aveRst[k] = (aveRst.get(k) or 0) + result[k]["time"]
+                aveRst[k] = min(aveRst.get(k) or 1e10, result[k]["time"])
 
-        for k in aveRst: aveRst[k] /= repeat
+        # for k in aveRst: aveRst[k] /= repeat
         data.append(aveRst)
         ks |= aveRst.keys()
 
