@@ -57,17 +57,17 @@ def merge(arr: list, tmp: list, l: int, m: int, r: int, le = lambda x, y: x <= y
 
 
 ## 用于确认merge的正确性
-def _mergeSort(arr: list, tmp: list, l, r):
+def _mergeSort(arr: list, tmp: list, l, r, key = lambda x: x):
     if l >= r - 1: 
         return
     m = (l+r+1) // 2
-    _mergeSort(arr, tmp, l, m)
-    _mergeSort(arr, tmp, m, r)
-    merge(arr, tmp, l, m, r)
+    _mergeSort(arr, tmp, l, m, key)
+    _mergeSort(arr, tmp, m, r, key)
+    merge(arr, tmp, l, m, r, lambda x, y: key(x) <= key(y))
 
-def mergeSort(arr: list):
+def mergeSort(arr: list, key = lambda x: x):
     tmp = [0] * len(arr)
-    _mergeSort(arr, tmp, 0, len(arr))
+    _mergeSort(arr, tmp, 0, len(arr), key)
 
 def swap(arr, i, j):
     x = arr[i]
@@ -126,7 +126,8 @@ def solve(problem: Problem, sortFunc = None):
     pointlist = problem.pointlist
     tmpList = [0] * len(pointlist)
 
-    pointlist.sort(key=lambda p: (p.x, p.y))
+    # pointlist.sort(key=lambda p: (p.x, p.y))
+    mergeSort(pointlist, lambda p: (p.x, p.y))
 
     uid = -1
     vid = -1
@@ -197,7 +198,7 @@ def checkCorrectness():
     fail = False
     for _ in range(100):
         print(f"turn {_}")
-        problem = generateProblem(10, 10, 500)
+        problem = generateProblem(10, 10, 5000)
         __l = [(p.x, p.y) for p in problem.pointlist]
         resA = solve(problem)
         resB = solveBrute(problem)
@@ -223,3 +224,5 @@ def checkCorrectness():
 
         if fail:
             break
+
+checkCorrectness()
