@@ -104,3 +104,5 @@ def multipleTest(repeat = 5):
             for k in ks:
                 file.write(f"{e.get(k) or 0}, ")
             file.write("\n")
+
+multipleTest()

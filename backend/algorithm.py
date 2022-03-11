@@ -224,5 +224,3 @@ def checkCorrectness():
 
         if fail:
             break
-
-checkCorrectness()
